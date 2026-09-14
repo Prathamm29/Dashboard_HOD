@@ -29,16 +29,18 @@ export function PlacementsPage() {
   ];
 
   return (
-    <div className="space-y-6">
-      <div className="flex items-center gap-2">
-        <Link to="/overview" className="flex items-center gap-1.5 text-sm text-primary-600 hover:text-primary-700 font-medium transition-colors">
-          <ArrowLeft size={16} />
-          Back to Overview
-        </Link>
-      </div>
-
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-        <h1 className="text-xl font-bold text-surface-900">Placements</h1>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '26px' }}>
+      <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: '16px', flexWrap: 'wrap' }}>
+        <div>
+          <Link to="/overview" style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', fontSize: '0.8rem', color: '#6366f1', fontWeight: 600, textDecoration: 'none', marginBottom: '8px' }}
+            onMouseEnter={(e) => (e.currentTarget.style.opacity = '0.75')}
+            onMouseLeave={(e) => (e.currentTarget.style.opacity = '1')}
+          >
+            <ArrowLeft size={14} /> Back to Overview
+          </Link>
+          <h1 style={{ fontSize: '1.6rem', fontWeight: 800, color: 'var(--text-primary)', letterSpacing: '-0.03em', fontFamily: "'Plus Jakarta Sans', sans-serif" }}>Placements</h1>
+          <p style={{ fontSize: '0.875rem', color: 'var(--text-muted)', marginTop: '4px' }}>Graduation batch placement statistics and CTC distribution</p>
+        </div>
         <FilterRail />
       </div>
 
@@ -79,10 +81,10 @@ export function PlacementsPage() {
       </div>
 
       {/* Charts */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 md:gap-6">
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px,1fr))', gap: '18px' }}>
         {/* CTC Band Bar Chart */}
-        <div className="bg-white rounded-xl border border-surface-200 p-5 animate-fade-in">
-          <h3 className="text-sm font-semibold text-surface-800 mb-4">
+        <div style={{ background: 'var(--bg-card)', borderRadius: '16px', border: '1px solid var(--border-color)', padding: '22px', boxShadow: 'var(--shadow-card-val)' }}>
+          <h3 style={{ fontSize: '0.9rem', fontWeight: 750, color: 'var(--text-primary)', fontFamily: "'Plus Jakarta Sans', sans-serif", marginBottom: '16px' }}>
             CTC Distribution — Graduating Batch
           </h3>
           <ResponsiveContainer width="100%" height={300}>
@@ -157,9 +159,9 @@ export function PlacementsPage() {
       </div>
 
       {/* Raw numbers table */}
-      <div className="bg-white rounded-xl border border-surface-200 overflow-hidden animate-fade-in">
-        <div className="px-5 py-3.5 border-b border-surface-200 bg-surface-50">
-          <h3 className="text-sm font-semibold text-surface-800">Placement Data — Raw Numbers</h3>
+      <div style={{ background: 'var(--bg-card)', borderRadius: '16px', border: '1px solid var(--border-color)', overflow: 'hidden', boxShadow: 'var(--shadow-card-val)' }}>
+        <div style={{ padding: '16px 22px', borderBottom: '1px solid var(--border-faint)', background: 'var(--bg-surface)' }}>
+          <h3 style={{ fontSize: '0.9rem', fontWeight: 750, color: 'var(--text-primary)', fontFamily: "'Plus Jakarta Sans', sans-serif" }}>Placement Data — Raw Numbers</h3>
         </div>
         <table className="w-full">
           <thead>

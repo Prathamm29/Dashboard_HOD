@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { FileBarChart, Download, Printer, CheckCircle2, BarChart3 } from 'lucide-react';
+import { FileBarChart, Download, Printer, CheckCircle2, BarChart3, TrendingUp } from 'lucide-react';
 import { FilterRail } from '../components/ui/FilterRail';
 import { KpiReportEmbed } from '../components/powerbi/KpiReportEmbed';
 import { useKpiStore, useDeptStore } from '../lib/store';
@@ -8,14 +8,14 @@ import { sectionSchemas } from '../lib/sectionSchema';
 
 export function ReportsPage() {
   const currentPeriodId = useKpiStore((s) => s.currentPeriodId);
-  const getSubmission = useKpiStore((s) => s.getSubmission);
-  const periods = useKpiStore((s) => s.periods);
+  const getSubmission   = useKpiStore((s) => s.getSubmission);
+  const periods         = useKpiStore((s) => s.periods);
   const [showPreview, setShowPreview] = useState(false);
-  const [showToast, setShowToast] = useState(false);
+  const [showToast,   setShowToast]   = useState(false);
   const dept = useDeptStore((s) => s.getSelectedDept());
 
-  const submission = getSubmission(currentPeriodId);
-  const metrics = calcSummaryMetrics(submission.data);
+  const submission    = getSubmission(currentPeriodId);
+  const metrics       = calcSummaryMetrics(submission.data);
   const currentPeriod = periods.find((p) => p.id === currentPeriodId);
 
   const handleDownloadPdf = () => {
@@ -23,142 +23,183 @@ export function ReportsPage() {
     setTimeout(() => setShowToast(false), 3000);
   };
 
+  const summaryMetrics = [
+    { label: 'Total Faculty',    value: metrics.totalFaculty,                  color: '#6366f1' },
+    { label: 'LMS Compliance',   value: `${metrics.lmsCompliancePercent}%`,    color: '#16a34a' },
+    { label: 'On-time %',        value: `${metrics.onTimePunchInPercent}%`,    color: '#0891b2' },
+    { label: 'Active MoUs',      value: metrics.activeMous,                    color: '#d97706' },
+    { label: 'Patents Filed',    value: metrics.patentsFiledYtd,               color: '#9333ea' },
+    { label: 'Placement Rate',   value: `${metrics.placementOfferRatePercent}%`, color: '#059669' },
+  ];
+
   return (
-    <div className="space-y-6">
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '26px' }}>
+
+      {/* ── Page Header ── */}
+      <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: '16px', flexWrap: 'wrap' }}>
         <div>
-          <h1 className="text-xl font-bold text-surface-900">Reports</h1>
-          <p className="text-sm text-surface-500 mt-0.5">
-            Interactive Power BI analytics and KPI summary reports.
+          <h1 style={{ fontSize: '1.6rem', fontWeight: 800, color: 'var(--text-primary)', letterSpacing: '-0.03em', fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
+            Reports
+          </h1>
+          <p style={{ fontSize: '0.875rem', color: 'var(--text-muted)', marginTop: '4px' }}>
+            Interactive Power BI analytics and KPI summary exports
           </p>
         </div>
         <FilterRail />
       </div>
 
-      {/* Power BI Interactive Dashboard */}
-      <div style={{
-        background: '#ffffff', borderRadius: '12px',
-        border: '1px solid #e2e8f0', overflow: 'hidden',
-        boxShadow: '0 1px 3px rgba(0,0,0,0.04)',
-      }}>
-        <div style={{
-          padding: '16px 20px', borderBottom: '1px solid #f1f5f9',
-          display: 'flex', alignItems: 'center', gap: '12px',
-        }}>
+      {/* ── Power BI Dashboard ── */}
+      <div style={{ background: 'var(--bg-card)', borderRadius: '16px', border: '1px solid var(--border-color)', overflow: 'hidden', boxShadow: 'var(--shadow-card-val)' }}>
+        <div style={{ padding: '18px 22px', borderBottom: '1px solid var(--border-faint)', display: 'flex', alignItems: 'center', gap: '12px' }}>
           <div style={{
-            width: '36px', height: '36px', borderRadius: '8px',
-            background: 'linear-gradient(135deg, #2563eb, #7c3aed)',
+            width: '38px', height: '38px', borderRadius: '12px',
+            background: 'linear-gradient(135deg, #4f46e5, #9333ea)',
             display: 'flex', alignItems: 'center', justifyContent: 'center',
-            flexShrink: 0,
+            boxShadow: '0 4px 10px rgba(79,70,229,0.3)',
           }}>
             <BarChart3 size={18} color="#fff" />
           </div>
           <div>
-            <h3 style={{ fontSize: '0.9rem', fontWeight: 700, color: '#0f172a' }}>
+            <h3 style={{ fontSize: '0.9rem', fontWeight: 750, color: 'var(--text-primary)', fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
               Power BI Interactive Dashboard
             </h3>
-            <p style={{ fontSize: '0.75rem', color: '#94a3b8', marginTop: '2px' }}>
-              Live KPI visualizations — {dept.name}
+            <p style={{ fontSize: '0.75rem', color: 'var(--text-faint)', marginTop: '1px' }}>
+              Live KPI visualizations · {dept.name}
             </p>
           </div>
         </div>
         <KpiReportEmbed periodId={currentPeriodId} minHeight={600} />
       </div>
 
-      {/* Action Bar */}
-      <div className="bg-white rounded-xl border border-surface-200 p-5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-        <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-lg bg-primary-100 flex items-center justify-center text-primary-600">
-            <FileBarChart size={20} />
+      {/* ── Action Bar ── */}
+      <div style={{
+        background: 'var(--bg-card)', borderRadius: '16px',
+        border: '1px solid var(--border-color)', padding: '20px 24px',
+        display: 'flex', flexDirection: 'row', alignItems: 'center',
+        justifyContent: 'space-between', gap: '16px', flexWrap: 'wrap',
+        boxShadow: 'var(--shadow-card-val)',
+      }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
+          <div style={{ width: '42px', height: '42px', borderRadius: '12px', background: 'linear-gradient(135deg, #eef2ff, #e0e7ff)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            <FileBarChart size={20} style={{ color: '#4f46e5' }} />
           </div>
           <div>
-            <p className="text-sm font-semibold text-surface-800">
+            <p style={{ fontSize: '0.9rem', fontWeight: 700, color: 'var(--text-primary)', fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
               KPI Summary Report — {currentPeriod?.label}
             </p>
-            <p className="text-xs text-surface-500">
+            <p style={{ fontSize: '0.75rem', color: 'var(--text-faint)', marginTop: '2px' }}>
               Last updated: {formatDate(submission.lastUpdated)}
             </p>
           </div>
         </div>
-        <div className="flex items-center gap-2">
+        <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexWrap: 'wrap' }}>
           <button
             onClick={() => setShowPreview(!showPreview)}
-            className="flex items-center gap-1.5 px-4 py-2 text-sm font-medium text-primary-700 bg-primary-50 hover:bg-primary-100 border border-primary-200 rounded-lg transition-colors focus-ring"
+            style={{
+              display: 'flex', alignItems: 'center', gap: '7px',
+              padding: '10px 18px', fontSize: '0.85rem', fontWeight: 650,
+              color: '#4f46e5', background: '#eef2ff',
+              border: '1px solid #c7d2fe', borderRadius: '12px',
+              cursor: 'pointer', fontFamily: 'inherit', transition: 'all 0.18s',
+            }}
+            onMouseEnter={(e) => { (e.currentTarget as HTMLButtonElement).style.background = '#e0e7ff'; }}
+            onMouseLeave={(e) => { (e.currentTarget as HTMLButtonElement).style.background = '#eef2ff'; }}
           >
             <Printer size={14} />
             {showPreview ? 'Hide Preview' : 'Generate Report'}
           </button>
           <button
             onClick={handleDownloadPdf}
-            className="flex items-center gap-1.5 px-4 py-2 text-sm font-medium text-white bg-primary-600 hover:bg-primary-700 rounded-lg transition-colors shadow-sm focus-ring"
+            style={{
+              display: 'flex', alignItems: 'center', gap: '7px',
+              padding: '10px 18px', fontSize: '0.85rem', fontWeight: 650,
+              color: '#ffffff',
+              background: 'linear-gradient(135deg, #4f46e5, #0d9488)',
+              border: 'none', borderRadius: '12px',
+              cursor: 'pointer', fontFamily: 'inherit',
+              boxShadow: '0 4px 12px rgba(79,70,229,0.3)',
+              transition: 'all 0.18s',
+            }}
+            onMouseEnter={(e) => { (e.currentTarget as HTMLButtonElement).style.boxShadow = '0 6px 20px rgba(79,70,229,0.4)'; (e.currentTarget as HTMLButtonElement).style.transform = 'translateY(-1px)'; }}
+            onMouseLeave={(e) => { (e.currentTarget as HTMLButtonElement).style.boxShadow = '0 4px 12px rgba(79,70,229,0.3)'; (e.currentTarget as HTMLButtonElement).style.transform = 'translateY(0)'; }}
           >
             <Download size={14} />
-            Download as PDF
+            Download PDF
           </button>
         </div>
       </div>
 
-      {/* Report Preview */}
+      {/* ── Report Preview ── */}
       {showPreview && (
-        <div className="bg-white rounded-xl border border-surface-200 overflow-hidden animate-scale-in print:shadow-none">
-          {/* Report Header */}
-          <div className="bg-gradient-primary px-8 py-6 text-white">
-            <h2 className="text-lg font-bold">Department KPI Report</h2>
-            <p className="text-primary-200 text-sm mt-1">
-              Department of {dept.name} — {currentPeriod?.label}
-            </p>
-            <p className="text-primary-300 text-xs mt-2">
-              Generated on {formatDate(new Date().toISOString())} | Data updated: {formatDate(submission.lastUpdated)}
+        <div style={{ background: 'var(--bg-card)', borderRadius: '16px', border: '1px solid var(--border-color)', overflow: 'hidden', boxShadow: 'var(--shadow-card-val)', animation: 'scaleIn 0.2s ease-out forwards' }}>
+          {/* Report header */}
+          <div style={{
+            padding: '28px 32px',
+            background: 'linear-gradient(135deg, #0d1b3e 0%, #1a2d6b 100%)',
+            position: 'relative', overflow: 'hidden',
+          }}>
+            <div style={{ position: 'absolute', top: '-40px', right: '-40px', width: '200px', height: '200px', borderRadius: '50%', background: 'radial-gradient(circle, rgba(99,102,241,0.25) 0%, transparent 70%)', pointerEvents: 'none' }} />
+            <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '8px' }}>
+              <TrendingUp size={18} style={{ color: '#818cf8' }} />
+              <span style={{ fontSize: '0.72rem', color: 'rgba(255,255,255,0.5)', fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase' }}>
+                Department KPI Report
+              </span>
+            </div>
+            <h2 style={{ fontSize: '1.4rem', fontWeight: 800, color: '#ffffff', letterSpacing: '-0.02em', fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
+              {dept.name}
+            </h2>
+            <p style={{ fontSize: '0.8rem', color: 'rgba(255,255,255,0.5)', marginTop: '4px' }}>
+              Period: {currentPeriod?.label} · Generated {formatDate(new Date().toISOString())}
             </p>
           </div>
 
-          {/* Summary Metrics */}
-          <div className="px-8 py-6 border-b border-surface-200">
-            <h3 className="text-sm font-semibold text-surface-800 uppercase tracking-wider mb-4">Key Metrics Summary</h3>
-            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4">
-              {[
-                { label: 'Total Faculty', value: metrics.totalFaculty },
-                { label: 'LMS Compliance', value: `${metrics.lmsCompliancePercent}%` },
-                { label: 'On-time %', value: `${metrics.onTimePunchInPercent}%` },
-                { label: 'Active MoUs', value: metrics.activeMous },
-                { label: 'Patents Filed', value: metrics.patentsFiledYtd },
-                { label: 'Placement Rate', value: `${metrics.placementOfferRatePercent}%` },
-              ].map((metric) => (
-                <div key={metric.label} className="bg-surface-50 rounded-lg p-3 text-center">
-                  <p className="text-2xl font-bold text-surface-900">{metric.value}</p>
-                  <p className="text-[10px] font-medium text-surface-500 uppercase mt-1">{metric.label}</p>
+          {/* Summary metrics */}
+          <div style={{ padding: '24px 28px', borderBottom: '1px solid var(--border-faint)' }}>
+            <p style={{ fontSize: '0.72rem', fontWeight: 700, color: 'var(--text-faint)', letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: '16px' }}>
+              Key Metrics Summary
+            </p>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))', gap: '12px' }}>
+              {summaryMetrics.map((m) => (
+                <div key={m.label} style={{
+                  background: 'var(--bg-surface)', borderRadius: '12px',
+                  padding: '16px', textAlign: 'center',
+                  border: '1px solid var(--border-color)',
+                  borderTop: `3px solid ${m.color}`,
+                }}>
+                  <p style={{ fontSize: '1.65rem', fontWeight: 800, color: m.color, letterSpacing: '-0.03em', fontFamily: "'Plus Jakarta Sans', sans-serif" }}>{m.value}</p>
+                  <p style={{ fontSize: '0.7rem', fontWeight: 600, color: 'var(--text-faint)', textTransform: 'uppercase', letterSpacing: '0.04em', marginTop: '4px' }}>{m.label}</p>
                 </div>
               ))}
             </div>
           </div>
 
-          {/* Section-by-Section Data */}
-          <div className="px-8 py-6 space-y-6">
-            <h3 className="text-sm font-semibold text-surface-800 uppercase tracking-wider">Section Details</h3>
+          {/* Section details */}
+          <div style={{ padding: '24px 28px', display: 'flex', flexDirection: 'column', gap: '14px' }}>
+            <p style={{ fontSize: '0.72rem', fontWeight: 700, color: 'var(--text-faint)', letterSpacing: '0.08em', textTransform: 'uppercase' }}>
+              Section Details
+            </p>
             {sectionSchemas.map((schema) => {
               const sectionData = submission.data[schema.key as keyof typeof submission.data] as unknown as Record<string, unknown>;
               return (
-                <div key={schema.key} className="border border-surface-200 rounded-lg overflow-hidden">
-                  <div className="bg-surface-50 px-4 py-2.5 border-b border-surface-200">
-                    <h4 className="text-sm font-semibold text-surface-800">{schema.title}</h4>
+                <div key={schema.key} style={{ border: '1px solid var(--border-color)', borderRadius: '12px', overflow: 'hidden' }}>
+                  <div style={{ padding: '10px 18px', background: 'var(--bg-surface)', borderBottom: '1px solid var(--border-faint)' }}>
+                    <h4 style={{ fontSize: '0.85rem', fontWeight: 700, color: 'var(--text-primary)', fontFamily: "'Plus Jakarta Sans', sans-serif" }}>{schema.title}</h4>
                   </div>
-                  <div className="px-4 py-3">
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-2">
-                      {schema.fields.map((field) => {
-                        const val = sectionData[field.key];
-                        const displayVal = Array.isArray(val)
-                          ? (val as string[]).join(', ') || '—'
-                          : val !== undefined && val !== null && val !== ''
-                          ? String(val)
-                          : '—';
-                        return (
-                          <div key={field.key} className="flex items-baseline justify-between py-1 border-b border-surface-100 last:border-0">
-                            <span className="text-xs text-surface-500 mr-2 truncate">{field.label}</span>
-                            <span className="text-xs font-semibold text-surface-800 shrink-0">{displayVal}</span>
-                          </div>
-                        );
-                      })}
-                    </div>
+                  <div style={{ padding: '12px 18px', display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '6px 20px' }}>
+                    {schema.fields.map((field) => {
+                      const val = sectionData[field.key];
+                      const displayVal = Array.isArray(val)
+                        ? (val as string[]).join(', ') || '—'
+                        : val !== undefined && val !== null && val !== ''
+                        ? String(val)
+                        : '—';
+                      return (
+                        <div key={field.key} style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', padding: '6px 0', borderBottom: '1px solid var(--border-faint)' }}>
+                          <span style={{ fontSize: '0.76rem', color: 'var(--text-faint)', marginRight: '8px', flex: 1 }}>{field.label}</span>
+                          <span style={{ fontSize: '0.76rem', fontWeight: 700, color: 'var(--text-primary)', flexShrink: 0 }}>{displayVal}</span>
+                        </div>
+                      );
+                    })}
                   </div>
                 </div>
               );
@@ -167,12 +208,19 @@ export function ReportsPage() {
         </div>
       )}
 
-      {/* Toast */}
+      {/* ── Toast ── */}
       {showToast && (
-        <div className="fixed bottom-6 right-6 z-50 animate-slide-in-right">
-          <div className="bg-surface-900 text-white px-5 py-3 rounded-xl shadow-xl text-sm font-medium flex items-center gap-2">
-            <CheckCircle2 size={16} className="text-warning-400" />
-            Export will be enabled once connected to backend.
+        <div style={{ position: 'fixed', bottom: '28px', right: '28px', zIndex: 50, animation: 'slideInRight 0.3s ease-out forwards' }}>
+          <div style={{
+            background: '#0d1b3e', color: 'white',
+            padding: '14px 20px', borderRadius: '14px',
+            boxShadow: '0 8px 32px rgba(0,0,0,0.3)',
+            fontSize: '0.875rem', fontWeight: 600,
+            display: 'flex', alignItems: 'center', gap: '10px',
+            border: '1px solid rgba(255,255,255,0.1)',
+          }}>
+            <CheckCircle2 size={16} style={{ color: '#4ade80' }} />
+            Export will be enabled once Power BI is connected.
           </div>
         </div>
       )}
